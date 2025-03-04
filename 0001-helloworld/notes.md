@@ -44,6 +44,8 @@ Files that allow the use of compiled code across lots of programs without needin
 - Can obvs view with anything cos its just C++
 - Only manipulates text, no actual compilation
 - The `.i` stands for intermediate
+- Intermediate files can be very big, like 30,000 lines or so even for simple hello world.
+    * However, the compiler won't need everything
 - What IS resolved:
     * `#include`, `#if`, macros
     * Any code from header files `.h`
@@ -120,6 +122,9 @@ main:
 - `g++ -c hw.s -o hw.o`
 - `objdump -d hw.o # Disassemble to see machine code`
 - `hexdump -C hw.o # to view raw binary`
+- This is also where debugger symbols can be inserted
+    * BUT YOU MUST HAVE `-g` AT EACH STEP TO PASS THROUGH ALL INFORMATION SUCH THAT IT ALL WORKS
+    * `g++ -c -g hw.s -o hw.o`
 
 #### 4. Linker .o -> executable | Creates the executable
 - `.o -> executable`
@@ -131,6 +136,10 @@ main:
     * e.g. dynmically linked, on x86-64 architecture, etc...
 - `ldd hw # shows linked libraries`
 - Ok, so the linker here needs to take all the created `.o` files one at a time. This is because we WANT to have everything compiled seperately (it makes editing code easier and not having to compile the same function multiple times)
+- If you want to check the checksum of an executable
+    * The build id is NOT the checksum of the whole file
+    * its a checksum of ELF headers and .text sections
+    * `objdump -s --section .note.gnu.build-id hw`
 
 #### 5. Extra libraries | .so files (shared object) and dll (dynamic libraries)
 - Where an `.o` object file is compiled, but as of yet unlinkedi. They have declarations but undefined references (including std::out)
