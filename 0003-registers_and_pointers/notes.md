@@ -14,7 +14,18 @@ Lets start by looking at registers in GDB:
 - Well hold, my computer is running many programs, while i'm sat in my breakpoint surely these registers are just hogged by my C++ program?
     * Correct, I already guessed the answer t my own question here, the OS context switches these values out and in when it's C++'s turn on the CPU
 
+#### Why aren't there more registers?
+- They are simply that expensive to have on the CPU. More die area etc.
+- Adding more registers means more complex instructions
+    * Right now, compilers know which registers they're getting. They know how to use them. Adding more complicates things
+- Diminishing returns?
+    * 16 of these registers are all thats needed for C++ and modern code
+
+#### Hold on, only 16?! Why are the other registers unused? Which 16?
+
 #### Register Types:
 | **Register** | Meaning |
 | -------- | -------- |
-| `rax`,`rbx`, `rcx`,... | General purpose - Often for temp storage, return values, loop counters |
+| The only... | ...16 Registers **DIRECTLY** used by programs like C++ |
+| `rax`,`rbx`, `rcx`, `rdx` | General purpose - Often for temp storage, return values, loop counters |
+| `rsi`, `rdi` | - Used for function call arguments. Used for first 2 parameters of calling convention. Leftover from old x86, and repurposed rather than removed. `rsi` (source index to source data), `rdi` (destination index to dest memory) |
