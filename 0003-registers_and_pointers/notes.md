@@ -31,5 +31,30 @@ Lets start by looking at registers in GDB:
 | `rbp` | The base pointer. (Frame pointer) - Holds the base address of the current stack frame. Used to track function calls? |
 | `rsp` | The stack pointer. Holds the address FOREFRONT of the stack - the top (lower memory addresses as the stack grows downards). This will obviously be changing as the stack moves up and down. DONT GET CONFUSED ABOUT TOP vs BOTTOM. So when the function returns, `rsp` resets back down (higher mem address) to `rbp` |
 | `r8`, ..., `r15` | 8 general purpose registers. There are no physical difference between these and the `rax` registers, this is simply the most efficient way to seperate things that compilers enjoy. |
-| `rip` | The 17th, an exception, Instruction pointer. It points to the address of the current instruction being executed, which is in the read-only text segment of memory |
 | **The rest of...** | **...the registers that exist on the CPU but aren't directly used by C++** |
+| `rip` | The 17th, an exception, Instruction pointer. It points to the address of the current instruction being executed, which is in the read-only text segment of memory |
+| `eflags` | 32 bit size. Extended flags (also `rflags`, but `gdb` sometimes calls it the older name), stores the flags for arithemetic like overflow, or zero etc... |
+| `-s` | These are all 'segment' registers, typically 32 bit or 16 bit. They are mostly obselete but used in legacy 32 bit architectures. BUT, there is a concept called Thread Local Storage which uses `fs` and `gs`. We keep these instead of simulating 32 bit with the larger 64 bit registers because older software has been designed to use these. Their removal breaks backwards compat. |
+| `cs` | Code segment. Mostly obselete. Originally used to mark code memory |
+| `ss` | Stack segment. Mostly obselete. Originally used to mark stack memory |
+| `ds` | Data segment. Mostly obselete. Originally used to mark global/static memory (think data segment from modern mem arch) |
+| `es` | Extra segment. Mostly obselete. Additional data segment |
+| `fs` | Fifth segment. Now used for thread-local storage. I THINK its redundent for 64 bit, they use `fs_base` instead. Fifth and general were chosen for other roles because they were the least used for their previous role and therefore most available. | 
+| `gs` | General segment. Now used for OS kernel storage. Fifth and general were chosen for other roles because they were the least used for their previous role and therefore most available.| 
+| `fs_base` | Fifth segment base? Now used for storing the thread-local storage pointer |
+| `fs_base` | General segment base? Now stores the per-CPU kernel data pointer |
+| `k[0-7]` | Used to be used for security, but not used in any relevant modern setting i found |
+
+#### Thread-local storage and Kernel Storage
+The `fs_base`, and `gs_base` registers all have modern uses between these two. I may as well outline them a little here.
+- Thread-local storage `fs_base`
+    * In a multithreaded system, we'll want to have speedups while avoiding race conditions with some variables to get shared across threads.
+    * To help with this, the OS gives each thread their own little section of memory that will mirror the structure of the other threads and each start at their own address `fs_base`.
+| Thread   | FS_BASE (Start of TLS) | x (offset +0) | y (offset +32) |
+| -------- | -------- | -------- | -------- |
+| Thread 1 | 0x100000 | 0x100000 (x) | 0x100020 (y) |
+| Thread 2 | 0x200000 |	0x200000 (x) | 0x200020 (y) |
+| Thread 3 | 0x300000 |	0x300000 (x) | 0x300020 (y) |
+| Thread 4 | 0x400000 |	0x400000 (x) | 0x400020 (y) |
+- Kernel Storage `gs_base`
+    * A similar concept to thread-local-storage, but shared between CPU cores for the kernel. An example of what they share would be the task queue.
