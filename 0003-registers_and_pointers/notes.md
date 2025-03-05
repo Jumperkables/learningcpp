@@ -16,4 +16,5 @@ Lets start by looking at registers in GDB:
 
 #### Register Types:
 | **Register** | Meaning |
+| -------- | -------- |
 | `rax`,`rbx`, `rcx`,... | General purpose - Often for temp storage, return values, loop counters |
