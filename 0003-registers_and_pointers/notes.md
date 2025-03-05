@@ -20,12 +20,16 @@ Lets start by looking at registers in GDB:
     * Right now, compilers know which registers they're getting. They know how to use them. Adding more complicates things
 - Diminishing returns?
     * 16 of these registers are all thats needed for C++ and modern code
+    * Most attempts to improve have found improvements not worth the cost
 
 #### Hold on, only 16?! Why are the other registers unused? Which 16?
-
-#### Register Types:
 | **Register** | Meaning |
 | -------- | -------- |
-| The only... | ...16 Registers **DIRECTLY** used by programs like C++ |
+| **The only...** | **...16 Registers DIRECTLY used by programs like C++** |
 | `rax`,`rbx`, `rcx`, `rdx` | General purpose - Often for temp storage, return values, loop counters |
 | `rsi`, `rdi` | - Used for function call arguments. Used for first 2 parameters of calling convention. Leftover from old x86, and repurposed rather than removed. `rsi` (source index to source data), `rdi` (destination index to dest memory) |
+| `rbp` | The base pointer. (Frame pointer) - Holds the base address of the current stack frame. Used to track function calls? |
+| `rsp` | The stack pointer. Holds the address FOREFRONT of the stack - the top (lower memory addresses as the stack grows downards). This will obviously be changing as the stack moves up and down. DONT GET CONFUSED ABOUT TOP vs BOTTOM. So when the function returns, `rsp` resets back down (higher mem address) to `rbp` |
+| `r8`, ..., `r15` | 8 general purpose registers. There are no physical difference between these and the `rax` registers, this is simply the most efficient way to seperate things that compilers enjoy. |
+| `rip` | The 17th, an exception, Instruction pointer. It points to the address of the current instruction being executed, which is in the read-only text segment of memory |
+| **The rest of...** | **...the registers that exist on the CPU but aren't directly used by C++** |
